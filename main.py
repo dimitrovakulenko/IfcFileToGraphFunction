@@ -1,5 +1,5 @@
 import json
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.responses import JSONResponse
 import os
 import shutil
@@ -14,7 +14,11 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 UPLOAD_TIMEOUT = 600  # 10 minutes
 
 @app.post("/upload")
-async def upload_chunk(request: Request):
+async def upload_chunk(
+    request: Request,
+    max_nodes: int = Query(50000, description="Maximum number of nodes to process"),
+    max_relationships: int = Query(50000, description="Maximum number of relationships to process")
+):
     """
     Handle chunked file uploads. Assemble chunks into a complete file and process it.
     """
@@ -50,7 +54,7 @@ async def upload_chunk(request: Request):
 
         # Process the IFC file into a graph
         try:
-            graph = process_ifc_to_graph(final_file_path)
+            graph = process_ifc_to_graph(final_file_path, max_nodes=max_nodes, max_relationships=max_relationships)
             os.remove(final_file_path)  # Clean up the IFC file
 
             response_size = len(json.dumps(graph))
