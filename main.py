@@ -1,15 +1,27 @@
 import json
+import tempfile
 from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.responses import JSONResponse
 import os
 import shutil
 from process_to_graph import process_ifc_to_graph
+from fastapi.middleware.cors import CORSMiddleware
 
 # Initialize the FastAPI app
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Replace with frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+)
+
 # Define upload directory and timeout
-UPLOAD_DIR = "/tmp/uploads"
+UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "uploads")
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+print(f"Upload directory: {UPLOAD_DIR}")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 UPLOAD_TIMEOUT = 600  # 10 minutes
 
@@ -40,28 +52,43 @@ async def upload_chunk(
         async for chunk in request.stream():
             f.write(chunk)
 
+    # Log chunk details
+    chunk_size = os.path.getsize(chunk_path)
+    print(f"Chunk {chunk_number} saved at {chunk_path} ({chunk_size} bytes)")
+
     # Check if all chunks are received
     if len(os.listdir(file_dir)) == total_chunks:
         # Reassemble the file
         final_file_path = os.path.join(UPLOAD_DIR, f"{file_id}.ifc")
+        print(f"All chunks received. Reassembling file: {final_file_path}")
         with open(final_file_path, "wb") as final_file:
             for i in range(total_chunks):
                 chunk_path = os.path.join(file_dir, f"chunk{i}")
+                chunk_size = os.path.getsize(chunk_path)
+                print(f"Adding chunk {i} ({chunk_size} bytes) from {chunk_path} to {final_file_path}")
                 with open(chunk_path, "rb") as chunk_file:
                     shutil.copyfileobj(chunk_file, final_file)
                 os.remove(chunk_path)  # Cleanup chunks
-            os.rmdir(file_dir)  # Remove the directory
+                print(f"Chunk {i} deleted: {chunk_path}")
+
+        # Remove the directory after all chunks are reassembled
+        os.rmdir(file_dir)
+        final_file_size = os.path.getsize(final_file_path)
+        print(f"File reassembled successfully: {final_file_path} ({final_file_size} bytes)")
 
         # Process the IFC file into a graph
         try:
             graph = process_ifc_to_graph(final_file_path, max_nodes=max_nodes, max_relationships=max_relationships)
             os.remove(final_file_path)  # Clean up the IFC file
+            print(f"Reassembled file processed and deleted: {final_file_path}")
 
             response_size = len(json.dumps(graph))
             print(f"Size of the output response: {response_size} bytes")
             return JSONResponse(content=graph)
         except Exception as e:
+            print(f"Error processing IFC file: {e}")
             os.remove(final_file_path)
             raise HTTPException(status_code=500, detail=f"Error processing IFC file: {str(e)}")
 
     return {"message": f"Chunk {chunk_number} received"}
+
