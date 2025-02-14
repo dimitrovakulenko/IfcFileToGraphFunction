@@ -40,10 +40,22 @@ def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000
             }
         })
 
+    for entity in entities:
+        entity_id = entity.id()
+        entity_type = entity.is_a()
+
+        attributes = entity.get_info()
+
+        if len(graph["nodes"]) >= max_nodes:
+            break  # Stop adding nodes if the limit is reached
+
         # Add relationships (limit to max_relationships)
         for rel_name, rel_value in attributes.items():
             if relationship_count >= max_relationships:
                 break
+
+            if isinstance(rel_value, tuple):
+                rel_value = list(rel_value)
 
             if isinstance(rel_value, ifcopenshell.entity_instance):
                 graph["edges"].append({
@@ -66,6 +78,22 @@ def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000
                         }
                     })
                     relationship_count += 1
+
+    # After creating all initial edges, add "reverted" relationships.
+    new_edges = []
+    for edge in graph["edges"]:
+        data = edge["data"]
+        new_edge = {
+            "data": {
+                "source": data["target"],
+                "target": data["source"],
+                "label": f"back_{data['label']}"
+            }
+        }
+        new_edges.append(new_edge)
+
+    # Append the new "back_" edges to the original graph edges.
+    graph["edges"].extend(new_edges)
 
     print(f"Graph created with {len(graph['nodes'])} nodes and {len(graph['edges'])} edges.")
     return graph

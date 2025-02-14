@@ -28,8 +28,8 @@ UPLOAD_TIMEOUT = 600  # 10 minutes
 @app.post("/upload")
 async def upload_chunk(
     request: Request,
-    max_nodes: int = Query(50000, description="Maximum number of nodes to process"),
-    max_relationships: int = Query(50000, description="Maximum number of relationships to process")
+    max_nodes: int = Query(100000, description="Maximum number of nodes to process"),
+    max_relationships: int = Query(100000, description="Maximum number of relationships to process")
 ):
     """
     Handle chunked file uploads. Assemble chunks into a complete file and process it.
