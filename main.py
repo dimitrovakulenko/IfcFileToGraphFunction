@@ -25,7 +25,7 @@ print(f"Upload directory: {UPLOAD_DIR}")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 UPLOAD_TIMEOUT = 600  # 10 minutes
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def upload_chunk(
     request: Request,
     max_nodes: int = Query(100000, description="Maximum number of nodes to process"),
