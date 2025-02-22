@@ -21,7 +21,6 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Get file from the request body (expects multipart/form-data with field "file")
         file = req.files.get("file")
         if not file:
-            logging.info('AAAAA')
             return func.HttpResponse("No file provided in the request.", status_code=400)
 
         # Save uploaded file to a temporary location
