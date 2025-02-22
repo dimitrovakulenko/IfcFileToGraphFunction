@@ -1,4 +1,4 @@
-#import ifcopenshell
+import ifcopenshell
 
 def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000):
     """
