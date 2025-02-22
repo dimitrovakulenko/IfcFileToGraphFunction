@@ -3,7 +3,7 @@ import os
 import json
 import tempfile
 import azure.functions as func
-#from process_to_graph import process_ifc_to_graph
+from process_to_graph import process_ifc_to_graph
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Processing IFC file upload request.")
