@@ -5,8 +5,7 @@
         "type": "httpTrigger",
         "direction": "in",
         "name": "req",
-        "methods": [ "post" ],
-        "route": "upload"
+        "methods": [ "post" ]
       },
       {
         "type": "http",
