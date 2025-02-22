@@ -7,15 +7,11 @@ import shutil
 from process_to_graph import process_ifc_to_graph
 from fastapi.middleware.cors import CORSMiddleware
 
-# Initialize the FastAPI app
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Replace with frontend origin
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
-    allow_headers=["*"],  # Allow all headers
+    allow_origins=["http://localhost:5173"]
 )
 
 # Define upload directory and timeout
@@ -28,8 +24,8 @@ UPLOAD_TIMEOUT = 600  # 10 minutes
 @app.post("/api/upload")
 async def upload_chunk(
     request: Request,
-    max_nodes: int = Query(100000, description="Maximum number of nodes to process"),
-    max_relationships: int = Query(100000, description="Maximum number of relationships to process")
+    max_nodes: int = Query(1000000, description="Maximum number of nodes to process"),
+    max_relationships: int = Query(1000000, description="Maximum number of relationships to process")
 ):
     """
     Handle chunked file uploads. Assemble chunks into a complete file and process it.

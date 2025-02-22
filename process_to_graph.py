@@ -2,7 +2,7 @@ import ifcopenshell
 
 def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000):
     """
-    Process an IFC file and convert it to a graph-compatible JSON for Cytoscape.
+    Process an IFC file and convert it to a JSON with a graph nodes and edges.
     Limits the number of nodes and relationships to the specified maximum values.
 
     Args:
@@ -23,9 +23,10 @@ def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000
     graph = {"nodes": [], "edges": []}
     relationship_count = 0
 
+    # create nodes with numeric attributes as node properties
     for entity in entities:
         if len(graph["nodes"]) >= max_nodes:
-            break  # Stop adding nodes if the limit is reached
+            break
 
         entity_id = entity.id()
         entity_type = entity.is_a()
@@ -40,6 +41,7 @@ def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000
             }
         })
 
+    # create edges for processed nodes
     for entity in entities:
         entity_id = entity.id()
         entity_type = entity.is_a()
@@ -47,9 +49,11 @@ def process_ifc_to_graph(ifc_file_path, max_nodes=50000, max_relationships=50000
         attributes = entity.get_info()
 
         if len(graph["nodes"]) >= max_nodes:
-            break  # Stop adding nodes if the limit is reached
+            break
 
-        # Add relationships (limit to max_relationships)
+        # Add relationships (limit to max_relationships).
+        # We consider a relationship to be present if an attribute value type is entity_instance 
+        # or array (or tuple) of entity_instance's
         for rel_name, rel_value in attributes.items():
             if relationship_count >= max_relationships:
                 break
