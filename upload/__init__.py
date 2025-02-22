@@ -31,8 +31,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info(f"File saved to temporary location: {file_path}")
 
         # Process the IFC file into a graph
-        #graph = process_ifc_to_graph(file_path, max_nodes=max_nodes, max_relationships=max_relationships)
-        graph = 'aaaa'
+        graph = process_ifc_to_graph(file_path, max_nodes=max_nodes, max_relationships=max_relationships)
 
         # Remove the temporary file
         os.remove(file_path)
