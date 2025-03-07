@@ -36,7 +36,7 @@ The core logic is implemented in the process_to_graph.py script which uses the I
 ### Deployment
 
 This project is configured to deploy to Azure Functions using GitHub Actions. 
-When you push to the main branch, the workflow .github/workflows/main_ifcfile-to-graph.yml will be executed to update the function version.
+The workflow .github/workflows/main_ifcfile-to-graph.yml deploys new version to Azure.
 The workflow file is generated automatically during Azure Function setup pointing to this repo.
 One step was added to the default workflow - "Download and extract IfcOpenShell" - it add ifcopenshell libraries.
 
