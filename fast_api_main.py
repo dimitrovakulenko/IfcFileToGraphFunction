@@ -1,6 +1,6 @@
 import json
 import tempfile
-from fastapi import FastAPI, Request, HTTPException, Query
+from fastapi import FastAPI, Request, HTTPException, Query, UploadFile, File
 from fastapi.responses import JSONResponse
 import os
 import shutil
@@ -22,6 +22,28 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 UPLOAD_TIMEOUT = 600  # 10 minutes
 
 @app.post("/api/upload")
+async def upload_complete_file(
+    file: UploadFile = File(...),
+    max_nodes: int = Query(1000000, description="Maximum number of nodes to process"),
+    max_relationships: int = Query(1000000, description="Maximum number of relationships to process")
+):
+    """
+    Handle complete IFC file uploads and process them.
+    """
+    try:
+        file_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(file_path, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+
+        # Process the IFC file into a graph
+        graph = process_ifc_to_graph(file_path, max_nodes=max_nodes, max_relationships=max_relationships)
+        os.remove(file_path)  # Clean up file after processing
+        return JSONResponse(content=graph)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing IFC file: {str(e)}")
+
+
+@app.post("/api/upload-chunk")
 async def upload_chunk(
     request: Request,
     max_nodes: int = Query(1000000, description="Maximum number of nodes to process"),
