@@ -1,5 +1,9 @@
 # ifcfile-to-graph
 
+(the front-end is accessible here: https://github.com/dimitrovakulenko/IfcFileToGraphApp)
+
+![Example of the user app](https://raw.githubusercontent.com/dimitrovakulenko/IfcFileToGraphApp/main/.assets/ifc_as_graph_showcase.gif)
+
 ifcfile-to-graph is an Azure Functions–based backend that processes Industry Foundation Classes (IFC) files and converts them into a JSON graph representation. 
 The graph includes nodes for IFC entities and edges for relationships between them. 
 
