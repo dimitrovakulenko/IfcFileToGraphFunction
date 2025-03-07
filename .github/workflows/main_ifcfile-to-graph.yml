@@ -37,7 +37,15 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Optional: Add step to run tests here
+      - name: Download and extract IfcOpenShell
+        run: |
+          IFC_OPENSHELL_BUILD="39-v0.8.0-2a5e42e"
+          curl -O https://s3.amazonaws.com/ifcopenshell-builds/ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
+          unzip ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
+          rm ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
+          # The extraction creates an "ifcopenshell" folder.
+          # Ensure it is in your project root so that it will be deployed.
+          mv ifcopenshell ./ifcopenshell      
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
