@@ -37,6 +37,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # Add this step when you deploy Azure Function with ifcopenshell
       - name: Download and extract IfcOpenShell
         run: |
           IFC_OPENSHELL_BUILD="39-v0.8.0-2a5e42e"
