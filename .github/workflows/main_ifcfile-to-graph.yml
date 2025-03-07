@@ -43,9 +43,6 @@ jobs:
           curl -O https://s3.amazonaws.com/ifcopenshell-builds/ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
           unzip ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
           rm ifcopenshell-python-${IFC_OPENSHELL_BUILD}-linux64.zip
-          # The extraction creates an "ifcopenshell" folder.
-          # Ensure it is in your project root so that it will be deployed.
-          mv ifcopenshell ./ifcopenshell      
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
