@@ -12,6 +12,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"]
+    allow_origins=["https://ifcfile-as-graph-app.dmytro-prototypes.net"]
 )
 
 # Define upload directory and timeout
